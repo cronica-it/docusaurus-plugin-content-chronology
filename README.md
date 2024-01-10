@@ -1,6 +1,9 @@
-# `@docusaurus/plugin-content-blog`
+# `@ilg/docusaurus-plugin-content-chronology`
 
-Blog plugin for Docusaurus.
+Chronology plugin for Docusaurus.
+
+It is identical to the blog plug-in, except the custom order,
+using the `frontMatter.event_date` property.
 
 ## Usage
 
