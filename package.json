@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test:generate-build-snap": "yarn docusaurus build src/__tests__/__fixtures__/website --out-dir build-snap && yarn rimraf src/__tests__/__fixtures__/website/.docusaurus && yarn rimraf src/__tests__/__fixtures__/website/build-snap/assets && git add src/__tests__/__fixtures__/website/build-snap"
+    "test:generate-build-snap": "yarn docusaurus build src/__tests__/__fixtures__/website --out-dir build-snap && yarn rimraf src/__tests__/__fixtures__/website/.docusaurus && yarn rimraf src/__tests__/__fixtures__/website/build-snap/assets && git add src/__tests__/__fixtures__/website/build-snap",
+    "deep-clean": "rm -rf node_modules package-lock.json lib",
+    "npm-install": "npm install"
   },
   "repository": {
     "type": "git",
