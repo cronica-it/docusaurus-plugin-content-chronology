@@ -22,7 +22,7 @@ export const eventDateComparator = ((a: BlogPost, b: BlogPost): number => {
     // logger.info(aEventDate);
     // logger.info(bEventDate);
 
-    const value: number = compareDates(aEventDate, bEventDate);
+    let value: number = compareDates(aEventDate, bEventDate);
     // logger.info(value)
     if (value !== 0) {
         return value
@@ -31,5 +31,10 @@ export const eventDateComparator = ((a: BlogPost, b: BlogPost): number => {
     const aEventEndDate: Date = new Date(a.metadata.eventEndDateISO);
     const bEventEndDate: Date = new Date(b.metadata.eventEndDateISO);
 
-    return compareDates(aEventEndDate, bEventEndDate)
+    value = compareDates(aEventEndDate, bEventEndDate)
+    if (value !== 0) {
+        return value
+    }
+
+    return compareDates(a.metadata.date, b.metadata.date)
 })
