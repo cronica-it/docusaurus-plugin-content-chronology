@@ -7,7 +7,7 @@
 
 import {normalizePluginOptions} from '@docusaurus/utils-validation';
 import {validateOptions, DEFAULT_OPTIONS} from '../options';
-import type {Options, PluginOptions} from '@docusaurus/plugin-content-blog';
+import type {Options, PluginOptions} from '@ilg/docusaurus-plugin-content-chronology';
 import type {Validate} from '@docusaurus/types';
 
 function testValidate(options?: Options) {

@@ -13,7 +13,7 @@ import {
   FrontMatterTOCHeadingLevels,
   ContentVisibilitySchema,
 } from '@docusaurus/utils-validation';
-import type {BlogPostFrontMatter} from '@docusaurus/plugin-content-blog';
+import type {BlogPostFrontMatter} from '@ilg/docusaurus-plugin-content-chronology';
 
 const BlogPostFrontMatterAuthorSchema = Joi.object({
   key: Joi.string(),

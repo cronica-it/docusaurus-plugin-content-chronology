@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-declare module '@docusaurus/plugin-content-blog' {
+declare module '@ilg/docusaurus-plugin-content-chronology' {
   import type {LoadedMDXContent} from '@docusaurus/mdx-loader';
   import type {MDXOptions} from '@docusaurus/mdx-loader';
   import type {FrontMatterTag, Tag} from '@docusaurus/utils';
@@ -532,7 +532,7 @@ declare module '@theme/BlogPostPage' {
     BlogPostFrontMatter,
     BlogSidebar,
     PropBlogPostContent,
-  } from '@docusaurus/plugin-content-blog';
+  } from '@ilg/docusaurus-plugin-content-chronology';
 
   export type FrontMatter = BlogPostFrontMatter;
 
@@ -557,7 +557,7 @@ declare module '@theme/BlogListPage' {
   import type {
     BlogSidebar,
     BlogPaginatedMetadata,
-  } from '@docusaurus/plugin-content-blog';
+  } from '@ilg/docusaurus-plugin-content-chronology';
 
   export interface Props {
     /** Blog sidebar. */
@@ -575,7 +575,7 @@ declare module '@theme/BlogListPage' {
 }
 
 declare module '@theme/BlogTagsListPage' {
-  import type {BlogSidebar} from '@docusaurus/plugin-content-blog';
+  import type {BlogSidebar} from '@ilg/docusaurus-plugin-content-chronology';
   import type {TagsListItem} from '@docusaurus/utils';
 
   export interface Props {
@@ -593,7 +593,7 @@ declare module '@theme/BlogTagsPostsPage' {
   import type {
     BlogSidebar,
     BlogPaginatedMetadata,
-  } from '@docusaurus/plugin-content-blog';
+  } from '@ilg/docusaurus-plugin-content-chronology';
   import type {TagModule} from '@docusaurus/utils';
 
   export interface Props {

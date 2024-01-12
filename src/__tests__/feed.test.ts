@@ -14,7 +14,7 @@ import {generateBlogPosts} from '../blogUtils';
 import {createBlogFeedFiles} from '../feed';
 import type {LoadContext, I18n} from '@docusaurus/types';
 import type {BlogContentPaths} from '../types';
-import type {PluginOptions} from '@docusaurus/plugin-content-blog';
+import type {PluginOptions} from '@ilg/docusaurus-plugin-content-chronology';
 
 const DefaultI18N: I18n = {
   currentLocale: 'en',

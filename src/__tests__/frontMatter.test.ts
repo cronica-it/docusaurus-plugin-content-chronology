@@ -7,7 +7,7 @@
 
 import {escapeRegexp} from '@docusaurus/utils';
 import {validateBlogPostFrontMatter} from '../frontMatter';
-import type {BlogPostFrontMatter} from '@docusaurus/plugin-content-blog';
+import type {BlogPostFrontMatter} from '@ilg/docusaurus-plugin-content-chronology';
 
 // TODO this abstraction reduce verbosity but it makes it harder to debug
 // It would be preferable to just expose helper methods

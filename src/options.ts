@@ -18,7 +18,7 @@ import type {
   PluginOptions,
   Options,
   FeedType,
-} from '@docusaurus/plugin-content-blog';
+} from '@ilg/docusaurus-plugin-content-chronology';
 import type {OptionValidationContext} from '@docusaurus/types';
 
 export const DEFAULT_OPTIONS: PluginOptions = {

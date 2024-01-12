@@ -23,7 +23,7 @@ import type {
   Options,
   PluginOptions,
   EditUrlFunction,
-} from '@docusaurus/plugin-content-blog';
+} from '@ilg/docusaurus-plugin-content-chronology';
 
 const markdown: MarkdownConfig = {
   format: 'mdx',

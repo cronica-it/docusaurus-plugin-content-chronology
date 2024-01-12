@@ -13,7 +13,7 @@ import type {
   BlogPostFrontMatter,
   BlogPostFrontMatterAuthor,
   BlogPostFrontMatterAuthors,
-} from '@docusaurus/plugin-content-blog';
+} from '@ilg/docusaurus-plugin-content-chronology';
 
 export type AuthorsMap = {[authorKey: string]: Author};
 

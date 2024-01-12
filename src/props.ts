@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 import type {TagsListItem, TagModule} from '@docusaurus/utils';
-import type {BlogTag, BlogTags} from '@docusaurus/plugin-content-blog';
+import type {BlogTag, BlogTags} from '@ilg/docusaurus-plugin-content-chronology';
 
 export function toTagsProp({blogTags}: {blogTags: BlogTags}): TagsListItem[] {
   return Object.values(blogTags)

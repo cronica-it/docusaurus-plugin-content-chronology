@@ -12,7 +12,7 @@ import type {
   PluginOptions,
   BlogPost,
   BlogContent,
-} from '@docusaurus/plugin-content-blog';
+} from '@ilg/docusaurus-plugin-content-chronology';
 
 const sampleBlogOptions: PluginOptions = {
   ...DEFAULT_OPTIONS,

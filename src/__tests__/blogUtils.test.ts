@@ -17,7 +17,7 @@ import {
   type LinkifyParams,
 } from '../blogUtils';
 import type {BlogBrokenMarkdownLink, BlogContentPaths} from '../types';
-import type {BlogPost} from '@docusaurus/plugin-content-blog';
+import type {BlogPost} from '@ilg/docusaurus-plugin-content-chronology';
 
 describe('truncate', () => {
   it('truncates texts', () => {

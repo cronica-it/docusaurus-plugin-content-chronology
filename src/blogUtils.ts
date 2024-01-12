@@ -36,7 +36,7 @@ import type {
   BlogPost,
   BlogTags,
   BlogPaginated,
-} from '@docusaurus/plugin-content-blog';
+} from '@ilg/docusaurus-plugin-content-chronology';
 import type {BlogContentPaths, BlogMarkdownLoaderOptions} from './types';
 
 export function truncate(fileString: string, truncateMarker: RegExp): string {
