@@ -14,6 +14,7 @@ import logger from '@docusaurus/logger'
 // If month/day are not present, extend with defaults.
 // It does not accept negative values.
 const makeDateISO = ((eventDate: string): string => {
+    // logger.info(eventDate)
     let newDate: Date
     if (eventDate.match(/[0-9][0-9]*-[0-9][0-9]*-[0-9][0-9]*/))
         newDate = new Date(eventDate);

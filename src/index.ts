@@ -110,7 +110,7 @@ export default async function pluginContentBlog(
         blogSidebarTitle,
       } = options;
 
-      logger.info('chronology loadContent() ' + pluginId)
+      // logger.info('chronology loadContent() ' + pluginId)
 
       const baseBlogUrl = normalizeUrl([baseUrl, routeBasePath]);
       const blogTagsListPath = normalizeUrl([baseBlogUrl, tagsBasePath]);
@@ -185,7 +185,7 @@ export default async function pluginContentBlog(
         archiveBasePath,
       } = options;
 
-      logger.info('chronology contentLoaded() ' + pluginId)
+      // logger.info('chronology contentLoaded() ' + pluginId)
 
       const { addRoute, createData, setGlobalData } = actions;
       const {
