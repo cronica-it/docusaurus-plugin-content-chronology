@@ -51,6 +51,9 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   authorsMapPath: 'authors.yml',
   readingTime: ({content, defaultReadingTime}) => defaultReadingTime({content}),
   sortPosts: 'descending',
+
+  showLastUpdateTime: false,
+  showLastUpdateAuthor: false,
 };
 
 const PluginOptionSchema = Joi.object<PluginOptions>({
@@ -134,7 +137,12 @@ const PluginOptionSchema = Joi.object<PluginOptions>({
   sortPosts: Joi.string()
     .valid('descending', 'ascending')
     .default(DEFAULT_OPTIONS.sortPosts),
-}).default(DEFAULT_OPTIONS);
+
+    showLastUpdateTime: Joi.bool().default(DEFAULT_OPTIONS.showLastUpdateTime),
+    showLastUpdateAuthor: Joi.bool().default(
+      DEFAULT_OPTIONS.showLastUpdateAuthor,
+    ),
+  }).default(DEFAULT_OPTIONS);
 
 export function validateOptions({
   validate,

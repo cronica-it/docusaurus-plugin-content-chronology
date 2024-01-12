@@ -27,20 +27,28 @@ import {
   isUnlisted,
   isDraft,
 } from '@docusaurus/utils';
-import {validateBlogPostFrontMatter} from './frontMatter';
-import {type AuthorsMap, getAuthorsMap, getBlogPostAuthors} from './authors';
-import type {LoadContext, ParseFrontMatter} from '@docusaurus/types';
+import { validateBlogPostFrontMatter } from './frontMatter';
+import { type AuthorsMap, getAuthorsMap, getBlogPostAuthors } from './authors';
+import type { LoadContext, ParseFrontMatter } from '@docusaurus/types';
 import type {
   PluginOptions,
   ReadingTimeFunction,
   BlogPost,
   BlogTags,
   BlogPaginated,
+  LastUpdateData,
+  FileChange,
 } from '@ilg/docusaurus-plugin-content-chronology';
-import type {BlogContentPaths, BlogMarkdownLoaderOptions} from './types';
+import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
 import { eventDateComparator } from './eventDateComparator'
 import type { ParsedEventDates } from './frontMatterEventDates'
 import { parseFrontMatterEventDates } from './frontMatterEventDates'
+import { getFileLastUpdate } from './lastUpdate';
+
+type LastUpdateOptions = Pick<
+  PluginOptions,
+  'showLastUpdateAuthor' | 'showLastUpdateTime'
+>;
 
 export function truncate(fileString: string, truncateMarker: RegExp): string {
   return fileString.split(truncateMarker, 1).shift()!;
@@ -50,7 +58,7 @@ export function getSourceToPermalink(blogPosts: BlogPost[]): {
   [aliasedPath: string]: string;
 } {
   return Object.fromEntries(
-    blogPosts.map(({metadata: {source, permalink}}) => [source, permalink]),
+    blogPosts.map(({ metadata: { source, permalink } }) => [source, permalink]),
   );
 }
 
@@ -124,7 +132,7 @@ export function getBlogTags({
     blogPosts,
     (blogPost) => blogPost.metadata.tags,
   );
-  return _.mapValues(groups, ({tag, items: tagBlogPosts}) => {
+  return _.mapValues(groups, ({ tag, items: tagBlogPosts }) => {
     const tagVisibility = getTagVisibility({
       items: tagBlogPosts,
       isUnlisted: (item) => item.metadata.unlisted,
@@ -157,16 +165,16 @@ export function parseBlogFileName(
 ): ParsedBlogFileName {
   const dateFilenameMatch = blogSourceRelative.match(DATE_FILENAME_REGEX);
   if (dateFilenameMatch) {
-    const {folder, text, date: dateString} = dateFilenameMatch.groups!;
+    const { folder, text, date: dateString } = dateFilenameMatch.groups!;
     // Always treat dates as UTC by adding the `Z`
     const date = new Date(`${dateString!}Z`);
     const slugDate = dateString!.replace(/-/g, '/');
     const slug = `/${slugDate}/${folder!}${text!}`;
-    return {date, text: text!, slug};
+    return { date, text: text!, slug };
   }
   const text = blogSourceRelative.replace(/(?:\/index)?\.mdx?$/, '');
   const slug = `/${text}`;
-  return {date: undefined, text, slug};
+  return { date: undefined, text, slug };
 }
 
 function formatBlogPostDate(
@@ -214,7 +222,7 @@ async function parseBlogPostMarkdownFile({
   }
 }
 
-const defaultReadingTime: ReadingTimeFunction = ({content, options}) =>
+const defaultReadingTime: ReadingTimeFunction = ({ content, options }) =>
   readingTime(content, options).minutes;
 
 async function processBlogSourceFile(
@@ -227,7 +235,7 @@ async function processBlogSourceFile(
   const {
     siteConfig: {
       baseUrl,
-      markdown: {parseFrontMatter},
+      markdown: { parseFrontMatter },
     },
     siteDir,
     i18n,
@@ -248,16 +256,30 @@ async function processBlogSourceFile(
 
   const blogSourceAbsolute = path.join(blogDirPath, blogSourceRelative);
 
-  const {frontMatter, content, contentTitle, excerpt} =
+  logger.info(blogSourceAbsolute)
+
+  const { frontMatter, content, contentTitle, excerpt } =
     await parseBlogPostMarkdownFile({
       filePath: blogSourceAbsolute,
       parseFrontMatter,
     });
 
+    const {
+      last_update: lastUpdateFrontMatter,
+    } = frontMatter;
+
+  const lastUpdate = await readLastUpdateData(
+    blogSourceAbsolute,
+    options,
+    lastUpdateFrontMatter,
+  );
+
+  logger.info(lastUpdate)
+
   const aliasedSource = aliasedSitePath(blogSourceAbsolute, siteDir);
 
-  const draft = isDraft({frontMatter});
-  const unlisted = isUnlisted({frontMatter});
+  const draft = isDraft({ frontMatter });
+  const unlisted = isUnlisted({ frontMatter });
 
   if (draft) {
     return undefined;
@@ -343,7 +365,7 @@ async function processBlogSourceFile(
     routeBasePath,
     tagsRouteBasePath,
   ]);
-  const authors = getBlogPostAuthors({authorsMap, frontMatter, baseUrl});
+  const authors = getBlogPostAuthors({ authorsMap, frontMatter, baseUrl });
 
   const parsedEventDates: ParsedEventDates = parseFrontMatterEventDates(frontMatter, date);
 
@@ -360,10 +382,10 @@ async function processBlogSourceFile(
       tags: normalizeFrontMatterTags(tagsBasePath, frontMatter.tags),
       readingTime: showReadingTime
         ? options.readingTime({
-            content,
-            frontMatter,
-            defaultReadingTime,
-          })
+          content,
+          frontMatter,
+          defaultReadingTime,
+        })
         : undefined,
       hasTruncateMarker: truncateMarker.test(content),
       authors,
@@ -374,9 +396,50 @@ async function processBlogSourceFile(
       eventEndDateISO: parsedEventDates.eventEndDateISO,
       eventDateFormatted: parsedEventDates.eventDateFormatted,
       eventIntervalFormatted: parsedEventDates.eventIntervalFormatted,
-      },
+    },
     content,
-};
+  };
+}
+
+async function readLastUpdateData(
+  filePath: string,
+  options: LastUpdateOptions,
+  lastUpdateFrontMatter: FileChange | undefined,
+): Promise<LastUpdateData> {
+  const { showLastUpdateAuthor, showLastUpdateTime } = options;
+  if (showLastUpdateAuthor || showLastUpdateTime) {
+    const frontMatterTimestamp = lastUpdateFrontMatter?.date
+      ? new Date(lastUpdateFrontMatter.date).getTime() / 1000
+      : undefined;
+
+    if (lastUpdateFrontMatter?.author && lastUpdateFrontMatter.date) {
+      return {
+        lastUpdatedAt: frontMatterTimestamp,
+        lastUpdatedBy: lastUpdateFrontMatter.author,
+      };
+    }
+
+    // Use fake data in dev for faster development.
+    const fileLastUpdateData =
+      true // process.env.NODE_ENV === 'production'
+        ? await getFileLastUpdate(filePath)
+        : {
+          author: 'Author',
+          timestamp: (new Date('2011-11-11T')).getSeconds(),
+        };
+    const { author, timestamp } = fileLastUpdateData ?? {};
+
+    return {
+      lastUpdatedBy: showLastUpdateAuthor
+        ? lastUpdateFrontMatter?.author ?? author
+        : undefined,
+      lastUpdatedAt: showLastUpdateTime
+        ? frontMatterTimestamp ?? timestamp
+        : undefined,
+    };
+  }
+
+  return {};
 }
 
 export async function generateBlogPosts(
@@ -384,7 +447,7 @@ export async function generateBlogPosts(
   context: LoadContext,
   options: PluginOptions,
 ): Promise<BlogPost[]> {
-  const {include, exclude} = options;
+  const { include, exclude } = options;
 
   if (!(await fs.pathExists(contentPaths.contentPath))) {
     return [];
@@ -412,7 +475,7 @@ export async function generateBlogPosts(
     } catch (err) {
       throw new Error(
         `Processing of blog source file path=${blogSourceFile} failed.`,
-        {cause: err as Error},
+        { cause: err as Error },
       );
     }
   }
@@ -450,7 +513,7 @@ export function linkify({
   sourceToPermalink,
   onBrokenMarkdownLink,
 }: LinkifyParams): string {
-  const {newContent, brokenMarkdownLinks} = replaceMarkdownLinks({
+  const { newContent, brokenMarkdownLinks } = replaceMarkdownLinks({
     siteDir,
     fileString,
     filePath,

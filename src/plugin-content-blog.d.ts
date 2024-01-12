@@ -6,12 +6,12 @@
  */
 
 declare module '@ilg/docusaurus-plugin-content-chronology' {
-  import type {LoadedMDXContent} from '@docusaurus/mdx-loader';
-  import type {MDXOptions} from '@docusaurus/mdx-loader';
-  import type {FrontMatterTag, Tag} from '@docusaurus/utils';
-  import type {DocusaurusConfig, Plugin, LoadContext} from '@docusaurus/types';
-  import type {Item as FeedItem} from 'feed';
-  import type {Overwrite} from 'utility-types';
+  import type { LoadedMDXContent } from '@docusaurus/mdx-loader';
+  import type { MDXOptions } from '@docusaurus/mdx-loader';
+  import type { FrontMatterTag, Tag } from '@docusaurus/utils';
+  import type { DocusaurusConfig, Plugin, LoadContext } from '@docusaurus/types';
+  import type { Item as FeedItem } from 'feed';
+  import type { Overwrite } from 'utility-types';
 
   export type Assets = {
     /**
@@ -154,6 +154,8 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     toc_min_heading_level?: number;
     /** Maximum TOC heading level. Must be between 2 and 6. */
     toc_max_heading_level?: number;
+
+    last_update?: FileChange;
   };
 
   export type BlogPostFrontMatterAuthor = Author & {
@@ -178,7 +180,24 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     | BlogPostFrontMatterAuthor
     | (string | BlogPostFrontMatterAuthor)[];
 
-  export type BlogPostMetadata = {
+  export type FileChange = {
+    author?: string;
+    /** Date can be any
+     * [parsable date string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse).
+     */
+    date?: Date | string;
+  };
+
+  export type LastUpdateData = {
+    /** A timestamp in **seconds**, directly acquired from `git log`. */
+    lastUpdatedAt?: number;
+    /** `lastUpdatedAt` formatted as a date according to the current locale. */
+    formattedLastUpdatedAt?: string;
+    /** The author's name directly acquired from `git log`. */
+    lastUpdatedBy?: string;
+  };
+
+  export type BlogPostMetadata = LastUpdateData & {
     /** Path to the Markdown source, with `@site` alias. */
     readonly source: string;
     /**
@@ -218,19 +237,19 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
      * Used in pagination. Generated after the other metadata, so not readonly.
      * Content is just a subset of another post's metadata.
      */
-    nextItem?: {readonly title: string; readonly permalink: string};
+    nextItem?: { readonly title: string; readonly permalink: string };
     /**
      * Used in pagination. Generated after the other metadata, so not readonly.
      * Content is just a subset of another post's metadata.
      */
-    prevItem?: {readonly title: string; readonly permalink: string};
+    prevItem?: { readonly title: string; readonly permalink: string };
     /**
      * Author metadata, normalized. Should be used in joint with
      * `assets.authorsImageUrls` on client side.
      */
     readonly authors: Author[];
     /** Front matter, as-is. */
-    readonly frontMatter: BlogPostFrontMatter & {[key: string]: unknown};
+    readonly frontMatter: BlogPostFrontMatter & { [key: string]: unknown };
     /** Tags, normalized. */
     readonly tags: Tag[];
     /**
@@ -317,7 +336,7 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     /** Markdown content. */
     content: string;
     /** Front matter. */
-    frontMatter?: BlogPostFrontMatter & {[key: string]: unknown};
+    frontMatter?: BlogPostFrontMatter & { [key: string]: unknown };
     /** Options accepted by ngryman/reading-time. */
     options?: ReadingTimeOptions;
   }) => number;
@@ -426,6 +445,11 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     readingTime: ReadingTimeFunctionOption;
     /** Governs the direction of blog post sorting. */
     sortPosts: 'ascending' | 'descending';
+
+    /**	Whether to display the last date the doc was updated. */
+    showLastUpdateTime?: boolean;
+    /** Whether to display the author who last updated the doc. */
+    showLastUpdateAuthor?: boolean;
   };
 
   /**
@@ -567,7 +591,7 @@ declare module '@theme/BlogPostPage/Metadata' {
 }
 
 declare module '@theme/BlogListPage' {
-  import type {Content} from '@theme/BlogPostPage';
+  import type { Content } from '@theme/BlogPostPage';
   import type {
     BlogSidebar,
     BlogPaginatedMetadata,
@@ -582,15 +606,15 @@ declare module '@theme/BlogListPage' {
      * Array of blog posts included on this page. Every post's metadata is also
      * available.
      */
-    readonly items: readonly {readonly content: Content}[];
+    readonly items: readonly { readonly content: Content }[];
   }
 
   export default function BlogListPage(props: Props): JSX.Element;
 }
 
 declare module '@theme/BlogTagsListPage' {
-  import type {BlogSidebar} from '@ilg/docusaurus-plugin-content-chronology';
-  import type {TagsListItem} from '@docusaurus/utils';
+  import type { BlogSidebar } from '@ilg/docusaurus-plugin-content-chronology';
+  import type { TagsListItem } from '@docusaurus/utils';
 
   export interface Props {
     /** Blog sidebar. */
@@ -603,12 +627,12 @@ declare module '@theme/BlogTagsListPage' {
 }
 
 declare module '@theme/BlogTagsPostsPage' {
-  import type {Content} from '@theme/BlogPostPage';
+  import type { Content } from '@theme/BlogPostPage';
   import type {
     BlogSidebar,
     BlogPaginatedMetadata,
   } from '@ilg/docusaurus-plugin-content-chronology';
-  import type {TagModule} from '@docusaurus/utils';
+  import type { TagModule } from '@docusaurus/utils';
 
   export interface Props {
     /** Blog sidebar. */
@@ -621,14 +645,14 @@ declare module '@theme/BlogTagsPostsPage' {
      * Array of blog posts included on this page. Every post's metadata is also
      * available.
      */
-    readonly items: readonly {readonly content: Content}[];
+    readonly items: readonly { readonly content: Content }[];
   }
 
   export default function BlogTagsPostsPage(props: Props): JSX.Element;
 }
 
 declare module '@theme/BlogArchivePage' {
-  import type {Content} from '@theme/BlogPostPage';
+  import type { Content } from '@theme/BlogPostPage';
 
   /** We may add extra metadata or prune some metadata from here */
   export type ArchiveBlogPost = Content;
