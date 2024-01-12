@@ -7,4 +7,15 @@ using the `frontMatter.event_date` property.
 
 ## Usage
 
-See [plugin-content-blog documentation](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-blog).
+See [plugin-content-blog documentation](https://docusaurus.io/docs/api/plugins/@ilg/docusaurus-plugin-content-chronology).
+
+Additional frontMatter properties:
+
+- event_date
+- event_end_date
+
+Format is:
+
+- YYYY (July 1st)
+- YYYY-MM (15th)
+- YYYY-MM-DD

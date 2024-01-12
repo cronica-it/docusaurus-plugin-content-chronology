@@ -6,7 +6,7 @@
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
 import type { DocusaurusConfig } from '@docusaurus/types';
-import type { PluginOptions, BlogPost } from '@docusaurus/plugin-content-blog';
+import type { PluginOptions, BlogPost } from '@ilg/docusaurus-plugin-content-chronology';
 export declare function createBlogFeedFiles({ blogPosts: allBlogPosts, options, siteConfig, outDir, locale, }: {
     blogPosts: BlogPost[];
     options: PluginOptions;

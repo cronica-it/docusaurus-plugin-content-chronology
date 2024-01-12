@@ -6,6 +6,6 @@
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
 import type { TranslationFile } from '@docusaurus/types';
-import type { PluginOptions, BlogContent } from '@docusaurus/plugin-content-blog';
+import type { PluginOptions, BlogContent } from '@ilg/docusaurus-plugin-content-chronology';
 export declare function getTranslationFiles(options: PluginOptions): TranslationFile[];
 export declare function translateContent(content: BlogContent, translationFiles: TranslationFile[]): BlogContent;

@@ -217,7 +217,10 @@ export async function createBlogFeedFiles({
   const blogPosts = allBlogPosts.filter(shouldBeInFeed);
 
   const feed = await generateBlogFeed({
-    blogPosts,
+    blogPosts: [...blogPosts].sort(
+      // Revert to the initial sort order by creation date.
+      (a, b) => b.metadata.date.getTime() - a.metadata.date.getTime()
+    ),
     options,
     siteConfig,
     outDir,

@@ -6,6 +6,7 @@
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
 import type { LoadContext, Plugin } from '@docusaurus/types';
-import type { PluginOptions, BlogContent } from '@docusaurus/plugin-content-blog';
+import type { PluginOptions, BlogContent } from '@ilg/docusaurus-plugin-content-chronology';
 export default function pluginContentBlog(context: LoadContext, options: PluginOptions): Promise<Plugin<BlogContent>>;
 export { validateOptions } from './options';
+export { eventDateComparator } from './eventDateComparator';

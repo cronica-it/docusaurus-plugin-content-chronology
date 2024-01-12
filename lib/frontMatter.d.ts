@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
-import type { BlogPostFrontMatter } from '@docusaurus/plugin-content-blog';
+import type { BlogPostFrontMatter } from '@ilg/docusaurus-plugin-content-chronology';
 export declare function validateBlogPostFrontMatter(frontMatter: {
     [key: string]: unknown;
 }): BlogPostFrontMatter;

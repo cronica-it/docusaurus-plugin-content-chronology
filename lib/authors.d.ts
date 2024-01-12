@@ -6,7 +6,7 @@
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
 import type { BlogContentPaths } from './types';
-import type { Author, BlogPostFrontMatter } from '@docusaurus/plugin-content-blog';
+import type { Author, BlogPostFrontMatter } from '@ilg/docusaurus-plugin-content-chronology';
 export type AuthorsMap = {
     [authorKey: string]: Author;
 };

@@ -27,12 +27,12 @@ import {
   shouldBeListed,
 } from './blogUtils';
 import footnoteIDFixer from './remark/footnoteIDFixer';
-import {translateContent, getTranslationFiles} from './translations';
-import {createBlogFeedFiles} from './feed';
+import { translateContent, getTranslationFiles } from './translations';
+import { createBlogFeedFiles } from './feed';
 
-import {toTagProp, toTagsProp} from './props';
-import type {BlogContentPaths, BlogMarkdownLoaderOptions} from './types';
-import type {LoadContext, Plugin, HtmlTags} from '@docusaurus/types';
+import { toTagProp, toTagsProp } from './props';
+import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
+import type { LoadContext, Plugin, HtmlTags } from '@docusaurus/types';
 import type {
   PluginOptions,
   BlogPostFrontMatter,
@@ -42,7 +42,8 @@ import type {
   BlogTags,
   BlogContent,
   BlogPaginated,
-} from '@docusaurus/plugin-content-blog';
+  ChronologyRecord,
+} from '@ilg/docusaurus-plugin-content-chronology';
 
 export default async function pluginContentBlog(
   context: LoadContext,
@@ -53,15 +54,15 @@ export default async function pluginContentBlog(
     siteConfig,
     generatedFilesDir,
     localizationDir,
-    i18n: {currentLocale},
+    i18n: { currentLocale },
   } = context;
-  const {onBrokenMarkdownLinks, baseUrl} = siteConfig;
+  const { onBrokenMarkdownLinks, baseUrl } = siteConfig;
 
   const contentPaths: BlogContentPaths = {
     contentPath: path.resolve(siteDir, options.path),
     contentPathLocalized: getPluginI18nPath({
       localizationDir,
-      pluginName: 'docusaurus-plugin-content-blog',
+      pluginName: 'docusaurus-plugin-content-chronology',
       pluginId: options.id,
     }),
   };
@@ -69,7 +70,7 @@ export default async function pluginContentBlog(
 
   const pluginDataDirRoot = path.join(
     generatedFilesDir,
-    'docusaurus-plugin-content-blog',
+    'docusaurus-plugin-content-chronology',
   );
   const dataDir = path.join(pluginDataDirRoot, pluginId);
   const aliasedSource = (source: string) =>
@@ -81,10 +82,10 @@ export default async function pluginContentBlog(
   });
 
   return {
-    name: 'docusaurus-plugin-content-blog',
+    name: 'docusaurus-plugin-content-chronology',
 
     getPathsToWatch() {
-      const {include} = options;
+      const { include } = options;
       const contentMarkdownGlobs = getContentPathList(contentPaths).flatMap(
         (contentPath) => include.map((pattern) => `${contentPath}/${pattern}`),
       );
@@ -108,6 +109,8 @@ export default async function pluginContentBlog(
         blogTitle,
         blogSidebarTitle,
       } = options;
+
+      logger.info('chronology loadContent() ' + pluginId)
 
       const baseBlogUrl = normalizeUrl([baseUrl, routeBasePath]);
       const blogTagsListPath = normalizeUrl([baseBlogUrl, tagsBasePath]);
@@ -171,7 +174,7 @@ export default async function pluginContentBlog(
       };
     },
 
-    async contentLoaded({content: blogContents, actions}) {
+    async contentLoaded({ content: blogContents, actions }) {
       const {
         blogListComponent,
         blogPostComponent,
@@ -182,7 +185,9 @@ export default async function pluginContentBlog(
         archiveBasePath,
       } = options;
 
-      const {addRoute, createData} = actions;
+      logger.info('chronology contentLoaded() ' + pluginId)
+
+      const { addRoute, createData, setGlobalData } = actions;
       const {
         blogSidebarTitle,
         blogPosts,
@@ -193,7 +198,7 @@ export default async function pluginContentBlog(
 
       const listedBlogPosts = blogPosts.filter(shouldBeListed);
 
-      const blogItemsToMetadata: {[postId: string]: BlogPostMetadata} = {};
+      const blogItemsToMetadata: { [postId: string]: BlogPostMetadata } = {};
 
       const sidebarBlogPosts =
         options.blogSidebarCount === 'ALL'
@@ -224,7 +229,7 @@ export default async function pluginContentBlog(
         // Create a blog archive route
         const archiveProp = await createData(
           `${docuHash(archiveUrl)}.json`,
-          JSON.stringify({blogPosts: listedBlogPosts}, null, 2),
+          JSON.stringify({ blogPosts: listedBlogPosts }, null, 2),
         );
         addRoute({
           path: archiveUrl,
@@ -258,7 +263,7 @@ export default async function pluginContentBlog(
       // Create routes for blog entries.
       await Promise.all(
         blogPosts.map(async (blogPost) => {
-          const {id, metadata} = blogPost;
+          const { id, metadata } = blogPost;
           await createData(
             // Note that this created data path must be in sync with
             // metadataPath provided to mdx-loader.
@@ -283,8 +288,8 @@ export default async function pluginContentBlog(
       // Create routes for blog's paginated list entries.
       await Promise.all(
         blogListPaginated.map(async (listPage) => {
-          const {metadata, items} = listPage;
-          const {permalink} = metadata;
+          const { metadata, items } = listPage;
+          const { permalink } = metadata;
           const pageMetadataPath = await createData(
             `${docuHash(permalink)}.json`,
             JSON.stringify(metadata, null, 2),
@@ -303,6 +308,26 @@ export default async function pluginContentBlog(
         }),
       );
 
+      const chronologyRecords: ChronologyRecord[] = []
+      blogPosts.map((post) => {
+        if (post.metadata.frontMatter.event_date) {
+          chronologyRecords.push({
+            interval: post.metadata.eventIntervalFormatted,
+            title: post.metadata.title,
+            permalink: post.metadata.permalink,
+            isInternational: post.metadata.frontMatter?.tags?.includes('international') || false
+          })
+        }
+      })
+
+      // chronologyRecords.forEach((record) => logger.info(record))
+
+      setGlobalData({
+        chronologyRecords
+      })
+
+      // ----------------------------------------------------------------------
+
       // Tags. This is the last part so we early-return if there are no tags.
       if (Object.keys(blogTags).length === 0) {
         return;
@@ -311,7 +336,7 @@ export default async function pluginContentBlog(
       async function createTagsListPage() {
         const tagsPropPath = await createData(
           `${docuHash(`${blogTagsListPath}-tags`)}.json`,
-          JSON.stringify(toTagsProp({blogTags}), null, 2),
+          JSON.stringify(toTagsProp({ blogTags }), null, 2),
         );
         addRoute({
           path: blogTagsListPath,
@@ -327,10 +352,10 @@ export default async function pluginContentBlog(
       async function createTagPostsListPage(tag: BlogTag): Promise<void> {
         await Promise.all(
           tag.pages.map(async (blogPaginated) => {
-            const {metadata, items} = blogPaginated;
+            const { metadata, items } = blogPaginated;
             const tagPropPath = await createData(
               `${docuHash(metadata.permalink)}.json`,
-              JSON.stringify(toTagProp({tag, blogTagsListPath}), null, 2),
+              JSON.stringify(toTagProp({ tag, blogTagsListPath }), null, 2),
             );
 
             const listMetadataPath = await createData(
@@ -357,7 +382,7 @@ export default async function pluginContentBlog(
       await Promise.all(Object.values(blogTags).map(createTagPostsListPage));
     },
 
-    translateContent({content, translationFiles}) {
+    translateContent({ content, translationFiles }) {
       return translateContent(content, translationFiles);
     },
 
@@ -461,11 +486,11 @@ export default async function pluginContentBlog(
       };
     },
 
-    async postBuild({outDir, content}) {
+    async postBuild({ outDir, content }) {
       if (!options.feedOptions.type) {
         return;
       }
-      const {blogPosts} = content;
+      const { blogPosts } = content;
       if (!blogPosts.length) {
         return;
       }
@@ -478,7 +503,7 @@ export default async function pluginContentBlog(
       });
     },
 
-    injectHtmlTags({content}) {
+    injectHtmlTags({ content }) {
       if (!content.blogPosts.length || !options.feedOptions.type) {
         return {};
       }
@@ -533,4 +558,7 @@ export default async function pluginContentBlog(
   };
 }
 
-export {validateOptions} from './options';
+export { validateOptions } from './options';
+
+export { eventDateComparator } from './eventDateComparator'
+

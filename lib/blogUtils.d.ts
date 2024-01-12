@@ -6,7 +6,7 @@
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
 import type { LoadContext } from '@docusaurus/types';
-import type { PluginOptions, BlogPost, BlogTags, BlogPaginated } from '@docusaurus/plugin-content-blog';
+import type { PluginOptions, BlogPost, BlogTags, BlogPaginated } from '@ilg/docusaurus-plugin-content-chronology';
 import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
 export declare function truncate(fileString: string, truncateMarker: RegExp): string;
 export declare function getSourceToPermalink(blogPosts: BlogPost[]): {

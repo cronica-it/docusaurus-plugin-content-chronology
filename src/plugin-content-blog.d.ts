@@ -237,6 +237,11 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
      * Marks the post as unlisted and visibly hides it unless directly accessed.
      */
     readonly unlisted: boolean;
+
+    readonly eventDateISO: string,
+    readonly eventEndDateISO: string,
+    readonly eventDateFormatted: string,
+    readonly eventIntervalFormatted: string
   };
   /**
    * @returns The edit URL that's directly plugged into metadata.
@@ -520,6 +525,13 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     PropBlogPostMetadata,
     Assets
   >;
+
+  export type ChronologyRecord = {
+    interval: string,
+    title: string,
+    permalink: string,
+    isInternational: boolean
+  }
 
   export default function pluginContentBlog(
     context: LoadContext,

@@ -38,6 +38,9 @@ import type {
   BlogPaginated,
 } from '@ilg/docusaurus-plugin-content-chronology';
 import type {BlogContentPaths, BlogMarkdownLoaderOptions} from './types';
+import { eventDateComparator } from './eventDateComparator'
+import type { ParsedEventDates } from './frontMatterEventDates'
+import { parseFrontMatterEventDates } from './frontMatterEventDates'
 
 export function truncate(fileString: string, truncateMarker: RegExp): string {
   return fileString.split(truncateMarker, 1).shift()!;
@@ -195,6 +198,7 @@ async function parseBlogPostMarkdownFile({
       parseFrontMatter,
       removeContentTitle: true,
     });
+
     return {
       ...result,
       frontMatter: validateBlogPostFrontMatter(result.frontMatter),
@@ -336,6 +340,8 @@ async function processBlogSourceFile(
   ]);
   const authors = getBlogPostAuthors({authorsMap, frontMatter, baseUrl});
 
+  const parsedEventDates: ParsedEventDates = parseFrontMatterEventDates(frontMatter, date);
+
   return {
     id: slug,
     metadata: {
@@ -358,9 +364,14 @@ async function processBlogSourceFile(
       authors,
       frontMatter,
       unlisted,
-    },
+
+      eventDateISO: parsedEventDates.eventDateISO,
+      eventEndDateISO: parsedEventDates.eventEndDateISO,
+      eventDateFormatted: parsedEventDates.eventDateFormatted,
+      eventIntervalFormatted: parsedEventDates.eventIntervalFormatted,
+      },
     content,
-  };
+};
 }
 
 export async function generateBlogPosts(
@@ -406,12 +417,15 @@ export async function generateBlogPosts(
   ).filter(Boolean) as BlogPost[];
 
   blogPosts.sort(
-    (a, b) => b.metadata.date.getTime() - a.metadata.date.getTime(),
+    // (a, b) => b.metadata.date.getTime() - a.metadata.date.getTime(),
+    eventDateComparator
   );
 
   if (options.sortPosts === 'ascending') {
     return blogPosts.reverse();
   }
+  // blogPosts.forEach((post) => logger.info(post.metadata.frontMatter.event_date))
+
   return blogPosts;
 }
 
