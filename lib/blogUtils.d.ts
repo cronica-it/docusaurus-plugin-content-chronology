@@ -12,12 +12,13 @@ export declare function truncate(fileString: string, truncateMarker: RegExp): st
 export declare function getSourceToPermalink(blogPosts: BlogPost[]): {
     [aliasedPath: string]: string;
 };
-export declare function paginateBlogPosts({ blogPosts, basePageUrl, blogTitle, blogDescription, postsPerPageOption, }: {
+export declare function paginateBlogPosts({ blogPosts, basePageUrl, blogTitle, blogDescription, postsPerPageOption, pageBasePath }: {
     blogPosts: BlogPost[];
     basePageUrl: string;
     blogTitle: string;
     blogDescription: string;
     postsPerPageOption: number | 'ALL';
+    pageBasePath: string;
 }): BlogPaginated[];
 export declare function shouldBeListed(blogPost: BlogPost): boolean;
 export declare function getBlogTags({ blogPosts, ...params }: {
@@ -25,6 +26,7 @@ export declare function getBlogTags({ blogPosts, ...params }: {
     blogTitle: string;
     blogDescription: string;
     postsPerPageOption: number | 'ALL';
+    pageBasePath: string;
 }): BlogTags;
 type ParsedBlogFileName = {
     date: Date | undefined;

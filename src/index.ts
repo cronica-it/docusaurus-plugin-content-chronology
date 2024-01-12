@@ -108,6 +108,7 @@ export default async function pluginContentBlog(
         blogDescription,
         blogTitle,
         blogSidebarTitle,
+        pageBasePath,
       } = options;
 
       // logger.info('chronology loadContent() ' + pluginId)
@@ -156,6 +157,7 @@ export default async function pluginContentBlog(
         blogDescription,
         postsPerPageOption,
         basePageUrl: baseBlogUrl,
+        pageBasePath,
       });
 
       const blogTags: BlogTags = getBlogTags({
@@ -163,6 +165,7 @@ export default async function pluginContentBlog(
         postsPerPageOption,
         blogDescription,
         blogTitle,
+        pageBasePath
       });
 
       return {

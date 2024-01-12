@@ -359,6 +359,8 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
      * `routeBasePath`. **DO NOT** include a trailing slash.
      */
     tagsBasePath: string;
+
+    pageBasePath: string;
     /**
      * URL route for the archive section of your blog. Will be appended to
      * `routeBasePath`. **DO NOT** include a trailing slash. Use `null` to
