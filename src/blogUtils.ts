@@ -256,17 +256,15 @@ async function processBlogSourceFile(
 
   const blogSourceAbsolute = path.join(blogDirPath, blogSourceRelative);
 
-  logger.info(blogSourceAbsolute)
-
   const { frontMatter, content, contentTitle, excerpt } =
     await parseBlogPostMarkdownFile({
       filePath: blogSourceAbsolute,
       parseFrontMatter,
     });
 
-    const {
-      last_update: lastUpdateFrontMatter,
-    } = frontMatter;
+  const {
+    last_update: lastUpdateFrontMatter,
+  } = frontMatter;
 
   const lastUpdate = await readLastUpdateData(
     blogSourceAbsolute,
@@ -274,7 +272,13 @@ async function processBlogSourceFile(
     lastUpdateFrontMatter,
   );
 
-  logger.info(lastUpdate)
+  if (lastUpdateFrontMatter) {
+    lastUpdateFrontMatter.author = lastUpdate.lastUpdatedBy
+    if (lastUpdate.lastUpdatedAt) {
+      lastUpdateFrontMatter.date = new Date(lastUpdate.lastUpdatedAt * 1000)
+    }
+  }
+
 
   const aliasedSource = aliasedSitePath(blogSourceAbsolute, siteDir);
 
@@ -369,6 +373,21 @@ async function processBlogSourceFile(
 
   const parsedEventDates: ParsedEventDates = parseFrontMatterEventDates(frontMatter, date);
 
+  const formatDate = (locale: string, date: Date, calendar: string): string => {
+    try {
+      return new Intl.DateTimeFormat(locale, {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'UTC',
+        calendar,
+      }).format(date);
+    } catch (err) {
+      logger.error`Can't format docs lastUpdatedAt date "${String(date)}"`;
+      throw err;
+    }
+  };
+
   return {
     id: slug,
     metadata: {
@@ -396,6 +415,15 @@ async function processBlogSourceFile(
       eventEndDateISO: parsedEventDates.eventEndDateISO,
       eventDateFormatted: parsedEventDates.eventDateFormatted,
       eventIntervalFormatted: parsedEventDates.eventIntervalFormatted,
+      lastUpdatedBy: lastUpdate.lastUpdatedBy,
+      lastUpdatedAt: lastUpdate.lastUpdatedAt,
+      formattedLastUpdatedAt: lastUpdate.lastUpdatedAt
+        ? formatDate(
+            i18n.currentLocale,
+            new Date(lastUpdate.lastUpdatedAt * 1000),
+            i18n.localeConfigs[i18n.currentLocale]!.calendar,
+          )
+        : undefined,
     },
     content,
   };
@@ -421,11 +449,11 @@ async function readLastUpdateData(
 
     // Use fake data in dev for faster development.
     const fileLastUpdateData =
-      true // process.env.NODE_ENV === 'production'
+      process.env.NODE_ENV === 'production'
         ? await getFileLastUpdate(filePath)
         : {
           author: 'Author',
-          timestamp: (new Date('2011-11-11T')).getSeconds(),
+          timestamp: (new Date()).getTime()/1000,
         };
     const { author, timestamp } = fileLastUpdateData ?? {};
 
