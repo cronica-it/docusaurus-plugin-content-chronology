@@ -276,9 +276,9 @@ async function processBlogSourceFile(
     lastUpdateFrontMatter.author = lastUpdate.lastUpdatedBy
     if (lastUpdate.lastUpdatedAt) {
       lastUpdateFrontMatter.date = new Date(lastUpdate.lastUpdatedAt * 1000)
+      logger.info(`${lastUpdateFrontMatter.date} ${blogSourceAbsolute}`)
     }
   }
-
 
   const aliasedSource = aliasedSitePath(blogSourceAbsolute, siteDir);
 
