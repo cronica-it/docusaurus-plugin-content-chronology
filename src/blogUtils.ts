@@ -449,7 +449,7 @@ async function readLastUpdateData(
 
     // Use fake data in dev for faster development.
     const fileLastUpdateData =
-      process.env.NODE_ENV === 'production'
+      true // process.env.NODE_ENV === 'production'
         ? await getFileLastUpdate(filePath)
         : {
           author: 'Author',
