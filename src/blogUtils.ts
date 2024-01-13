@@ -272,12 +272,9 @@ async function processBlogSourceFile(
     lastUpdateFrontMatter,
   );
 
-  if (lastUpdateFrontMatter) {
-    lastUpdateFrontMatter.author = lastUpdate.lastUpdatedBy
-    if (lastUpdate.lastUpdatedAt) {
-      lastUpdateFrontMatter.date = new Date(lastUpdate.lastUpdatedAt * 1000)
-      logger.info(`${lastUpdateFrontMatter.date} ${blogSourceAbsolute}`)
-    }
+  if (lastUpdate.lastUpdatedAt) {
+    const dateOut = (new Date(lastUpdate.lastUpdatedAt * 1000)).toISOString()
+    logger.info(`${dateOut} ${blogSourceAbsolute}`)
   }
 
   const aliasedSource = aliasedSitePath(blogSourceAbsolute, siteDir);
@@ -449,7 +446,7 @@ async function readLastUpdateData(
 
     // Use fake data in dev for faster development.
     const fileLastUpdateData =
-      true // process.env.NODE_ENV === 'production'
+      process.env.NODE_ENV === 'production'
         ? await getFileLastUpdate(filePath)
         : {
           author: 'Author',
