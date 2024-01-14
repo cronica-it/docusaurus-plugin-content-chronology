@@ -218,8 +218,12 @@ export async function createBlogFeedFiles({
 
   const feed = await generateBlogFeed({
     blogPosts: [...blogPosts].sort(
-      // Revert to the initial sort order by creation date.
-      (a, b) => b.metadata.date.getTime() - a.metadata.date.getTime()
+      // Revert to the initial sort order by latUpdate/creation date.
+      (a, b) => {
+        const dateA = a.metadata.lastUpdatedAt ? new Date(a.metadata.lastUpdatedAt) : a.metadata.date
+        const dateB = b.metadata.lastUpdatedAt ? new Date(b.metadata.lastUpdatedAt) : b.metadata.date
+        return dateB.getTime() - dateA.getTime()
+      }
     ),
     options,
     siteConfig,
