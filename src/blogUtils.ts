@@ -26,9 +26,10 @@ import {
   getContentPathList,
   isUnlisted,
   isDraft,
+  Tag,
 } from '@docusaurus/utils';
 import { validateBlogPostFrontMatter } from './frontMatter';
-import { type AuthorsMap, getAuthorsMap, getBlogPostAuthors } from './authors';
+import { type AuthorsMap, getAuthorsMap, getBlogPostAuthors, groupAuthoredItems } from './authors';
 import type { LoadContext, ParseFrontMatter } from '@docusaurus/types';
 import type {
   PluginOptions,
@@ -38,12 +39,14 @@ import type {
   BlogPaginated,
   LastUpdateData,
   FileChange,
+  BlogAuthors,
 } from '@ilg/docusaurus-plugin-content-chronology';
 import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
 import { eventDateComparator } from './eventDateComparator'
 import type { ParsedEventDates } from './frontMatterEventDates'
 import { parseFrontMatterEventDates } from './frontMatterEventDates'
 import { getFileLastUpdate } from './lastUpdate';
+import { getAuthorVisibility } from './utils/authors';
 
 type LastUpdateOptions = Pick<
   PluginOptions,
@@ -151,6 +154,40 @@ export function getBlogTags({
   });
 }
 
+export function getBlogAuthors({
+  blogPosts,
+  ...params
+}: {
+  blogPosts: BlogPost[];
+  blogTitle: string;
+  blogDescription: string;
+  postsPerPageOption: number | 'ALL';
+  pageBasePath: string
+}): BlogAuthors {
+  const groups = groupAuthoredItems(
+    blogPosts,
+    (blogPost) => blogPost.metadata.authors,
+  );
+  return _.mapValues(groups, ({ author, items: authorBlogPosts }) => {
+    const authorVisibility = getAuthorVisibility({
+      items: authorBlogPosts,
+      isUnlisted: (item) => item.metadata.unlisted,
+    });
+    return {
+      name: author.name,
+      items: authorVisibility.listedItems.map((item) => item.id),
+      permalink: author.permalink,
+      pages: author.permalink ? paginateBlogPosts({
+        blogPosts: authorVisibility.listedItems,
+        basePageUrl: author.permalink,
+        ...params,
+      }) : [],
+      unlisted: authorVisibility.unlisted,
+    };
+  });
+}
+
+
 const DATE_FILENAME_REGEX =
   /^(?<folder>.*)(?<date>\d{4}[-/]\d{1,2}[-/]\d{1,2})[-/]?(?<text>.*?)(?:\/index)?.mdx?$/;
 
@@ -243,6 +280,7 @@ async function processBlogSourceFile(
   const {
     routeBasePath,
     tagsBasePath: tagsRouteBasePath,
+    authorsBasePath: authorsRouteBasePath,
     truncateMarker,
     showReadingTime,
     editUrl,
@@ -366,7 +404,17 @@ async function processBlogSourceFile(
     routeBasePath,
     tagsRouteBasePath,
   ]);
-  const authors = getBlogPostAuthors({ authorsMap, frontMatter, baseUrl });
+  const tags: Tag[] = normalizeFrontMatterTags(tagsBasePath, frontMatter.tags)
+
+  const authorsBasePath = normalizeUrl([
+    baseUrl,
+    routeBasePath,
+    authorsRouteBasePath,
+  ]);
+
+  const authors = getBlogPostAuthors({ authorsMap, frontMatter, baseUrl, authorsBasePath });
+
+  // authors.forEach((a) => logger.info(a))
 
   const parsedEventDates: ParsedEventDates = parseFrontMatterEventDates(frontMatter, date);
 
@@ -395,7 +443,9 @@ async function processBlogSourceFile(
       description,
       date,
       formattedDate,
-      tags: normalizeFrontMatterTags(tagsBasePath, frontMatter.tags),
+      tags,
+      authors,
+
       readingTime: showReadingTime
         ? options.readingTime({
           content,
@@ -404,7 +454,6 @@ async function processBlogSourceFile(
         })
         : undefined,
       hasTruncateMarker: truncateMarker.test(content),
-      authors,
       frontMatter,
       unlisted,
 

@@ -60,6 +60,11 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
      * to generate a fallback `mailto:` URL.
      */
     email?: string;
+
+    /**
+     * Available only when name is defined.
+     */
+    permalink?: string;
     /**
      * Unknown keys are allowed, so that we can pass custom fields to authors,
      * e.g., `twitter`.
@@ -379,6 +384,8 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
      */
     tagsBasePath: string;
 
+    authorsBasePath: string;
+
     pageBasePath: string;
     /**
      * URL route for the archive section of your blog. Will be appended to
@@ -409,6 +416,10 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     blogTagsListComponent: string;
     /** Root component of the "posts containing tag" page. */
     blogTagsPostsComponent: string;
+    /** Root component of the authors list page. */
+    blogAuthorsListComponent: string;
+    /** Root component of the "posts containing author" page. */
+    blogAuthorsPostsComponent: string;
     /** Root component of the blog archive page. */
     blogArchiveComponent: string;
     /** Blog page title for better SEO. */
@@ -490,6 +501,8 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     blogListPaginated: BlogPaginated[];
     blogTags: BlogTags;
     blogTagsListPath: string;
+    blogAuthors: BlogAuthors;
+    blogAuthorsListPath: string;
   };
 
   export type BlogTags = {
@@ -497,6 +510,17 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
   };
 
   export type BlogTag = Tag & {
+    /** Blog post permalinks. */
+    items: string[];
+    pages: BlogPaginated[];
+    unlisted: boolean;
+  };
+
+  export type BlogAuthors = {
+    [permalink: string]: BlogAuthor;
+  };
+
+  export type BlogAuthor = Author & {
     /** Blog post permalinks. */
     items: string[];
     pages: BlogPaginated[];
@@ -564,6 +588,8 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
     options: PluginOptions,
   ): Promise<Plugin<BlogContent>>;
 }
+
+// ---------------------------------------------------------------------------
 
 declare module '@theme/BlogPostPage' {
   import type {

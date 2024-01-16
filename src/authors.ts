@@ -5,6 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import _ from 'lodash';
 import {getDataFileData, normalizeUrl} from '@docusaurus/utils';
 import {Joi, URISchema} from '@docusaurus/utils-validation';
 import type {BlogContentPaths} from './types';
@@ -69,6 +70,7 @@ type AuthorsParam = {
   frontMatter: BlogPostFrontMatter;
   authorsMap: AuthorsMap | undefined;
   baseUrl: string;
+  authorsBasePath: string;
 };
 
 function normalizeImageUrl({
@@ -83,14 +85,30 @@ function normalizeImageUrl({
     : imageURL;
 }
 
+/**
+ * Generate an URL from an author name.
+ * Remove diacritics and change spaces to dashes.
+ * @param name
+ * @returns
+ */
+function makeUrlFromName(name: string): string {
+  return name.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "").replaceAll(' ', '-').replaceAll(/[-][-]*/g, '-').replaceAll(/[^0-9a-z-]/g, '');
+}
+
+function makeAuthorPermalink(name: string, authorsBasePath: string): string {
+  return `${authorsBasePath}/${makeUrlFromName(name)}`
+}
+
 // Legacy v1/early-v2 front matter fields
 // We may want to deprecate those in favor of using only frontMatter.authors
 function getFrontMatterAuthorLegacy({
   baseUrl,
   frontMatter,
+  authorsBasePath,
 }: {
   baseUrl: string;
   frontMatter: BlogPostFrontMatter;
+  authorsBasePath: string
 }): Author | undefined {
   const name = frontMatter.author;
   const title = frontMatter.author_title ?? frontMatter.authorTitle;
@@ -100,12 +118,15 @@ function getFrontMatterAuthorLegacy({
     baseUrl,
   });
 
+  const permalink = name ? makeAuthorPermalink(name, authorsBasePath) : undefined
+
   if (name || title || url || imageURL) {
     return {
       name,
       title,
       url,
       imageURL,
+      permalink
     };
   }
 
@@ -133,7 +154,7 @@ function normalizeFrontMatterAuthors(
 }
 
 function getFrontMatterAuthors(params: AuthorsParam): Author[] {
-  const {authorsMap} = params;
+  const {authorsMap, authorsBasePath} = params;
   const frontMatterAuthors = normalizeFrontMatterAuthors(
     params.frontMatter.authors,
   );
@@ -151,6 +172,11 @@ Valid author keys are:
 ${Object.keys(authorsMap)
   .map((validKey) => `- ${validKey}`)
   .join('\n')}`);
+      }
+      if (author.name) {
+        author.permalink = makeAuthorPermalink(author.name, authorsBasePath)
+      } else {
+        author.permalink = makeAuthorPermalink(key, authorsBasePath)
       }
       return author;
     }
@@ -197,4 +223,46 @@ Don't mix 'authors' with other existing 'author_*' front matter. Choose one or t
   }
 
   return updatedAuthors;
+}
+
+type AuthoredItemGroup<Item> = {
+  author: Author;
+  items: Item[];
+};
+
+export function groupAuthoredItems<Item>(
+  items: readonly Item[],
+  /**
+   * A callback telling me how to get the tags list of the current item. Usually
+   * simply getting it from some metadata of the current item.
+   */
+  getItemAuthors: (item: Item) => readonly Author[],
+): {[permalink: string]: AuthoredItemGroup<Item>} {
+  const result: {[permalink: string]: AuthoredItemGroup<Item>} = {};
+
+  items.forEach((item) => {
+    getItemAuthors(item).forEach((author) => {
+      // Init missing tag groups
+      // TODO: it's not really clear what should be the behavior if 2 tags have
+      // the same permalink but the label is different for each
+      // For now, the first tag found wins
+      if (author.permalink) {
+        result[author.permalink] ??= {
+          author,
+          items: [],
+        };
+
+        // Add item to group
+        result[author.permalink]!.items.push(item);
+      }
+    });
+  });
+
+  // If user add twice the same author to a md doc (weird but possible),
+  // we don't want the item to appear twice in the list...
+  Object.values(result).forEach((group) => {
+    group.items = _.uniq(group.items);
+  });
+
+  return result;
 }

@@ -32,6 +32,8 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   showReadingTime: true,
   blogTagsPostsComponent: '@theme/BlogTagsPostsPage',
   blogTagsListComponent: '@theme/BlogTagsListPage',
+  blogAuthorsPostsComponent: '@theme/BlogAuthorsPostsPage', // !!!
+  blogAuthorsListComponent: '@theme/BlogAuthorsListPage', // !!!
   blogPostComponent: '@theme/BlogPostPage',
   blogListComponent: '@theme/BlogListPage',
   blogArchiveComponent: '@theme/BlogArchivePage',
@@ -44,6 +46,7 @@ export const DEFAULT_OPTIONS: PluginOptions = {
   exclude: GlobExcludeDefault,
   routeBasePath: 'blog',
   tagsBasePath: 'tags',
+  authorsBasePath: 'authors',
   archiveBasePath: 'archive',
   pageBasePath: 'page',
   path: 'blog',
@@ -63,6 +66,7 @@ const PluginOptionSchema = Joi.object<PluginOptions>({
     .allow(null),
   routeBasePath: RouteBasePathSchema.default(DEFAULT_OPTIONS.routeBasePath),
   tagsBasePath: Joi.string().default(DEFAULT_OPTIONS.tagsBasePath),
+  authorsBasePath: Joi.string().default(DEFAULT_OPTIONS.authorsBasePath),
   pageBasePath: Joi.string().default(DEFAULT_OPTIONS.pageBasePath),
   include: Joi.array().items(Joi.string()).default(DEFAULT_OPTIONS.include),
   exclude: Joi.array().items(Joi.string()).default(DEFAULT_OPTIONS.exclude),
@@ -76,6 +80,12 @@ const PluginOptionSchema = Joi.object<PluginOptions>({
   ),
   blogTagsPostsComponent: Joi.string().default(
     DEFAULT_OPTIONS.blogTagsPostsComponent,
+  ),
+  blogAuthorsListComponent: Joi.string().default(
+    DEFAULT_OPTIONS.blogAuthorsListComponent,
+  ),
+  blogAuthorsPostsComponent: Joi.string().default(
+    DEFAULT_OPTIONS.blogAuthorsPostsComponent,
   ),
   blogArchiveComponent: Joi.string().default(
     DEFAULT_OPTIONS.blogArchiveComponent,

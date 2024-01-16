@@ -23,6 +23,7 @@ import {
   generateBlogPosts,
   getSourceToPermalink,
   getBlogTags,
+  getBlogAuthors,
   paginateBlogPosts,
   shouldBeListed,
 } from './blogUtils';
@@ -30,7 +31,7 @@ import footnoteIDFixer from './remark/footnoteIDFixer';
 import { translateContent, getTranslationFiles } from './translations';
 import { createBlogFeedFiles } from './feed';
 
-import { toTagProp, toTagsProp } from './props';
+import { toAuthorsProp, toAuthorProp, toTagProp, toTagsProp } from './props';
 import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
 import type { LoadContext, Plugin, HtmlTags } from '@docusaurus/types';
 import type {
@@ -40,6 +41,8 @@ import type {
   Assets,
   BlogTag,
   BlogTags,
+  BlogAuthor,
+  BlogAuthors,
   BlogContent,
   BlogPaginated,
   ChronologyRecord,
@@ -105,6 +108,7 @@ export default async function pluginContentBlog(
         postsPerPage: postsPerPageOption,
         routeBasePath,
         tagsBasePath,
+        authorsBasePath,
         blogDescription,
         blogTitle,
         blogSidebarTitle,
@@ -115,6 +119,7 @@ export default async function pluginContentBlog(
 
       const baseBlogUrl = normalizeUrl([baseUrl, routeBasePath]);
       const blogTagsListPath = normalizeUrl([baseBlogUrl, tagsBasePath]);
+      const blogAuthorsListPath = normalizeUrl([baseBlogUrl, authorsBasePath]);
       const blogPosts = await generateBlogPosts(contentPaths, context, options);
       const listedBlogPosts = blogPosts.filter(shouldBeListed);
 
@@ -126,10 +131,13 @@ export default async function pluginContentBlog(
           blogTags: {},
           blogTagsListPath,
           blogTagsPaginated: [],
+          blogAuthors: {},
+          blogAuthorsListPath,
+          blogAuthorsPaginated: [],
         };
       }
 
-      // Colocate next and prev metadata.
+      // Collocate next and prev metadata.
       listedBlogPosts.forEach((blogPost, index) => {
         const prevItem = index > 0 ? listedBlogPosts[index - 1] : null;
         if (prevItem) {
@@ -168,12 +176,22 @@ export default async function pluginContentBlog(
         pageBasePath
       });
 
+      const blogAuthors: BlogAuthors = getBlogAuthors({
+        blogPosts,
+        postsPerPageOption,
+        blogDescription,
+        blogTitle,
+        pageBasePath
+      });
+
       return {
         blogSidebarTitle,
         blogPosts,
         blogListPaginated,
         blogTags,
         blogTagsListPath,
+        blogAuthors,
+        blogAuthorsListPath,
       };
     },
 
@@ -183,6 +201,8 @@ export default async function pluginContentBlog(
         blogPostComponent,
         blogTagsListComponent,
         blogTagsPostsComponent,
+        blogAuthorsListComponent,
+        blogAuthorsPostsComponent,
         blogArchiveComponent,
         routeBasePath,
         archiveBasePath,
@@ -197,6 +217,8 @@ export default async function pluginContentBlog(
         blogListPaginated,
         blogTags,
         blogTagsListPath,
+        blogAuthors,
+        blogAuthorsListPath,
       } = blogContents;
 
       const listedBlogPosts = blogPosts.filter(shouldBeListed);
@@ -331,58 +353,116 @@ export default async function pluginContentBlog(
 
       // ----------------------------------------------------------------------
 
-      // Tags. This is the last part so we early-return if there are no tags.
-      if (Object.keys(blogTags).length === 0) {
-        return;
+      // Tags.
+      if (Object.keys(blogTags).length > 0) {
+
+        async function createTagsListPage() {
+          const tagsPropPath = await createData(
+            `${docuHash(`${blogTagsListPath}-tags`)}.json`,
+            JSON.stringify(toTagsProp({ blogTags }), null, 2),
+          );
+          addRoute({
+            path: blogTagsListPath,
+            component: blogTagsListComponent,
+            exact: true,
+            modules: {
+              sidebar: aliasedSource(sidebarProp),
+              tags: aliasedSource(tagsPropPath),
+            },
+          });
+        }
+
+        async function createTagPostsListPage(tag: BlogTag): Promise<void> {
+          await Promise.all(
+            tag.pages.map(async (blogPaginated) => {
+              const { metadata, items } = blogPaginated;
+              const tagPropPath = await createData(
+                `${docuHash(metadata.permalink)}.json`,
+                JSON.stringify(toTagProp({ tag, blogTagsListPath }), null, 2),
+              );
+
+              const listMetadataPath = await createData(
+                `${docuHash(metadata.permalink)}-list.json`,
+                JSON.stringify(metadata, null, 2),
+              );
+
+              addRoute({
+                path: metadata.permalink,
+                component: blogTagsPostsComponent,
+                exact: true,
+                modules: {
+                  sidebar: aliasedSource(sidebarProp),
+                  items: blogPostItemsModule(items),
+                  tag: aliasedSource(tagPropPath),
+                  listMetadata: aliasedSource(listMetadataPath),
+                },
+              });
+            }),
+          );
+        }
+
+        await createTagsListPage();
+        await Promise.all(Object.values(blogTags).map(createTagPostsListPage));
       }
 
-      async function createTagsListPage() {
-        const tagsPropPath = await createData(
-          `${docuHash(`${blogTagsListPath}-tags`)}.json`,
-          JSON.stringify(toTagsProp({ blogTags }), null, 2),
-        );
-        addRoute({
-          path: blogTagsListPath,
-          component: blogTagsListComponent,
-          exact: true,
-          modules: {
-            sidebar: aliasedSource(sidebarProp),
-            tags: aliasedSource(tagsPropPath),
-          },
-        });
+      // ----------------------------------------------------------------------
+
+      // Authors.
+      if (Object.keys(blogAuthors).length > 0) {
+
+        async function createAuthorsListPage() {
+          const authorsPropPath = await createData(
+            `${docuHash(`${blogAuthorsListPath}-authors`)}.json`,
+            JSON.stringify(toAuthorsProp({ blogAuthors }), null, 2),
+          );
+          addRoute({
+            path: blogAuthorsListPath,
+            component: blogAuthorsListComponent,
+            exact: true,
+            modules: {
+              sidebar: aliasedSource(sidebarProp),
+              authors: aliasedSource(authorsPropPath),
+            },
+          });
+        }
+
+        async function createAuthorPostsListPage(author: BlogAuthor): Promise<void> {
+          await Promise.all(
+            author.pages.map(async (blogPaginated) => {
+              const { metadata, items } = blogPaginated;
+              // logger.info('createAuthorPostsListPage author')
+              // logger.info(toAuthorProp({ author, blogAuthorsListPath }))
+              const authorPropPath = await createData(
+                `${docuHash(metadata.permalink)}.json`,
+                JSON.stringify(toAuthorProp({ author, blogAuthorsListPath }), null, 2),
+              );
+
+              // logger.info('createAuthorPostsListPage metadata')
+              // logger.info(metadata)
+
+              const listMetadataPath = await createData(
+                `${docuHash(metadata.permalink)}-list.json`,
+                JSON.stringify(metadata, null, 2),
+              );
+
+              addRoute({
+                path: metadata.permalink,
+                component: blogAuthorsPostsComponent,
+                exact: true,
+                modules: {
+                  sidebar: aliasedSource(sidebarProp),
+                  items: blogPostItemsModule(items),
+                  author: aliasedSource(authorPropPath),
+                  listMetadata: aliasedSource(listMetadataPath),
+                },
+              });
+            }),
+          );
+        }
+
+        await createAuthorsListPage();
+        await Promise.all(Object.values(blogAuthors).map(createAuthorPostsListPage));
       }
-
-      async function createTagPostsListPage(tag: BlogTag): Promise<void> {
-        await Promise.all(
-          tag.pages.map(async (blogPaginated) => {
-            const { metadata, items } = blogPaginated;
-            const tagPropPath = await createData(
-              `${docuHash(metadata.permalink)}.json`,
-              JSON.stringify(toTagProp({ tag, blogTagsListPath }), null, 2),
-            );
-
-            const listMetadataPath = await createData(
-              `${docuHash(metadata.permalink)}-list.json`,
-              JSON.stringify(metadata, null, 2),
-            );
-
-            addRoute({
-              path: metadata.permalink,
-              component: blogTagsPostsComponent,
-              exact: true,
-              modules: {
-                sidebar: aliasedSource(sidebarProp),
-                items: blogPostItemsModule(items),
-                tag: aliasedSource(tagPropPath),
-                listMetadata: aliasedSource(listMetadataPath),
-              },
-            });
-          }),
-        );
-      }
-
-      await createTagsListPage();
-      await Promise.all(Object.values(blogTags).map(createTagPostsListPage));
     },
 
     translateContent({ content, translationFiles }) {
