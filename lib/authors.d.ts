@@ -19,6 +19,19 @@ type AuthorsParam = {
     frontMatter: BlogPostFrontMatter;
     authorsMap: AuthorsMap | undefined;
     baseUrl: string;
+    authorsBasePath: string;
 };
 export declare function getBlogPostAuthors(params: AuthorsParam): Author[];
+type AuthoredItemGroup<Item> = {
+    author: Author;
+    items: Item[];
+};
+export declare function groupAuthoredItems<Item>(items: readonly Item[], 
+/**
+ * A callback telling me how to get the tags list of the current item. Usually
+ * simply getting it from some metadata of the current item.
+ */
+getItemAuthors: (item: Item) => readonly Author[]): {
+    [permalink: string]: AuthoredItemGroup<Item>;
+};
 export {};

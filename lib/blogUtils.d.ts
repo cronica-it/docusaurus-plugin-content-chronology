@@ -6,7 +6,7 @@
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
 import type { LoadContext } from '@docusaurus/types';
-import type { PluginOptions, BlogPost, BlogTags, BlogPaginated } from '@ilg/docusaurus-plugin-content-chronology';
+import type { PluginOptions, BlogPost, BlogTags, BlogPaginated, BlogAuthors } from '@ilg/docusaurus-plugin-content-chronology';
 import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
 export declare function truncate(fileString: string, truncateMarker: RegExp): string;
 export declare function getSourceToPermalink(blogPosts: BlogPost[]): {
@@ -28,6 +28,13 @@ export declare function getBlogTags({ blogPosts, ...params }: {
     postsPerPageOption: number | 'ALL';
     pageBasePath: string;
 }): BlogTags;
+export declare function getBlogAuthors({ blogPosts, ...params }: {
+    blogPosts: BlogPost[];
+    blogTitle: string;
+    blogDescription: string;
+    postsPerPageOption: number | 'ALL';
+    pageBasePath: string;
+}): BlogAuthors;
 type ParsedBlogFileName = {
     date: Date | undefined;
     text: string;

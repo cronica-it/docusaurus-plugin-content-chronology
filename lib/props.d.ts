@@ -7,6 +7,8 @@
  */
 import type { TagsListItem, TagModule } from '@docusaurus/utils';
 import type { BlogTag, BlogTags } from '@ilg/docusaurus-plugin-content-chronology';
+import type { AuthorsListItem, AuthorModule } from './utils/authors';
+import type { BlogAuthor, BlogAuthors } from '@ilg/docusaurus-plugin-content-chronology';
 export declare function toTagsProp({ blogTags }: {
     blogTags: BlogTags;
 }): TagsListItem[];
@@ -14,3 +16,10 @@ export declare function toTagProp({ blogTagsListPath, tag, }: {
     blogTagsListPath: string;
     tag: BlogTag;
 }): TagModule;
+export declare function toAuthorsProp({ blogAuthors }: {
+    blogAuthors: BlogAuthors;
+}): AuthorsListItem[];
+export declare function toAuthorProp({ blogAuthorsListPath, author, }: {
+    blogAuthorsListPath: string;
+    author: BlogAuthor;
+}): AuthorModule;
