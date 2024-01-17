@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 /// <reference path="../src/plugin-content-blog.d.ts" />
-import type { PluginOptions, Options } from '@ilg/docusaurus-plugin-content-chronology';
+import type { PluginOptions, Options } from '@xpack/docusaurus-plugin-content-blog';
 import type { OptionValidationContext } from '@docusaurus/types';
 export declare const DEFAULT_OPTIONS: PluginOptions;
 export declare function validateOptions({ validate, options, }: OptionValidationContext<Options | undefined, PluginOptions>): PluginOptions;

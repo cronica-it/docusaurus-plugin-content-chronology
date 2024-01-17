@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 /// <reference path="../../src/plugin-content-blog.d.ts" />
-import { Author } from '@ilg/docusaurus-plugin-content-chronology';
+import { Author } from '@xpack/docusaurus-plugin-content-blog';
 /** What the authors list page should know about each tag. */
 export type AuthorsListItem = Author & {
     /** Number of posts/docs with this author. */

@@ -14,7 +14,7 @@ import type {
   BlogPostFrontMatter,
   BlogPostFrontMatterAuthor,
   BlogPostFrontMatterAuthors,
-} from '@ilg/docusaurus-plugin-content-chronology';
+} from '@xpack/docusaurus-plugin-content-blog';
 
 export type AuthorsMap = {[authorKey: string]: Author};
 

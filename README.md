@@ -1,4 +1,4 @@
-# `@ilg/docusaurus-plugin-content-chronology`
+# `@xpack/docusaurus-plugin-content-blog`
 
 Chronology plugin for Docusaurus.
 
@@ -7,7 +7,7 @@ using the `frontMatter.event_date` property.
 
 ## Usage
 
-See [plugin-content-blog documentation](https://docusaurus.io/docs/api/plugins/@ilg/docusaurus-plugin-content-chronology).
+See [plugin-content-blog documentation](https://docusaurus.io/docs/api/plugins/@xpack/docusaurus-plugin-content-blog).
 
 Additional frontMatter properties:
 

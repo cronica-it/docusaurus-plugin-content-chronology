@@ -6,7 +6,7 @@
  */
 
 import { normalizeUrl } from '@docusaurus/utils';
-import { Author } from '@ilg/docusaurus-plugin-content-chronology';
+import { Author } from '@xpack/docusaurus-plugin-content-blog';
 import _ from 'lodash';
 // import {normalizeUrl} from './urlUtils';
 

@@ -20,7 +20,7 @@ import type {
   Author,
   BlogPost,
   BlogFeedItem,
-} from '@ilg/docusaurus-plugin-content-chronology';
+} from '@xpack/docusaurus-plugin-content-blog';
 
 async function generateBlogFeed({
   blogPosts,

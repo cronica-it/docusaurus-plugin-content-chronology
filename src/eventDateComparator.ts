@@ -9,7 +9,7 @@
  * be obtained from https://opensource.org/license/mit/.
  */
 
-import type { BlogPost } from '@ilg/docusaurus-plugin-content-chronology';
+import type { BlogPost } from '@xpack/docusaurus-plugin-content-blog';
 import logger from '@docusaurus/logger'
 
 const compareDates = ((aEventDate: Date, bEventDate: Date): number => {

@@ -46,7 +46,7 @@ import type {
   BlogContent,
   BlogPaginated,
   ChronologyRecord,
-} from '@ilg/docusaurus-plugin-content-chronology';
+} from '@xpack/docusaurus-plugin-content-blog';
 
 export default async function pluginContentBlog(
   context: LoadContext,
@@ -65,7 +65,7 @@ export default async function pluginContentBlog(
     contentPath: path.resolve(siteDir, options.path),
     contentPathLocalized: getPluginI18nPath({
       localizationDir,
-      pluginName: 'docusaurus-plugin-content-chronology',
+      pluginName: 'docusaurus-plugin-content-blog',
       pluginId: options.id,
     }),
   };
@@ -73,7 +73,7 @@ export default async function pluginContentBlog(
 
   const pluginDataDirRoot = path.join(
     generatedFilesDir,
-    'docusaurus-plugin-content-chronology',
+    'docusaurus-plugin-content-blog',
   );
   const dataDir = path.join(pluginDataDirRoot, pluginId);
   const aliasedSource = (source: string) =>
@@ -85,7 +85,7 @@ export default async function pluginContentBlog(
   });
 
   return {
-    name: 'docusaurus-plugin-content-chronology',
+    name: 'docusaurus-plugin-content-blog',
 
     getPathsToWatch() {
       const { include } = options;

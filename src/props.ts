@@ -5,10 +5,10 @@
  * LICENSE file in the root directory of this source tree.
  */
 import type {TagsListItem, TagModule} from '@docusaurus/utils';
-import type {BlogTag, BlogTags} from '@ilg/docusaurus-plugin-content-chronology';
+import type {BlogTag, BlogTags} from '@xpack/docusaurus-plugin-content-blog';
 
 import type {AuthorsListItem, AuthorModule} from './utils/authors';
-import type {BlogAuthor, BlogAuthors} from '@ilg/docusaurus-plugin-content-chronology';
+import type {BlogAuthor, BlogAuthors} from '@xpack/docusaurus-plugin-content-blog';
 
 import logger from '@docusaurus/logger';
 

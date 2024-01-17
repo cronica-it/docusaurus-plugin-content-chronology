@@ -40,7 +40,7 @@ import type {
   LastUpdateData,
   FileChange,
   BlogAuthors,
-} from '@ilg/docusaurus-plugin-content-chronology';
+} from '@xpack/docusaurus-plugin-content-blog';
 import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
 import { eventDateComparator } from './eventDateComparator'
 import type { ParsedEventDates } from './frontMatterEventDates'
