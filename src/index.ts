@@ -335,7 +335,7 @@ export default async function pluginContentBlog(
 
       const chronologyRecords: ChronologyRecord[] = []
       blogPosts.map((post) => {
-        if (post.metadata.frontMatter.event_date) {
+        if (post.metadata.eventIntervalFormatted) {
           chronologyRecords.push({
             interval: post.metadata.eventIntervalFormatted,
             title: post.metadata.title,
@@ -643,5 +643,5 @@ export default async function pluginContentBlog(
 
 export { validateOptions } from './options';
 
-export { eventDateComparator } from './eventDateComparator'
+export { blogDateComparator } from './blogDateComparator'
 

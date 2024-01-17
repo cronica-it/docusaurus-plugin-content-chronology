@@ -42,7 +42,7 @@ import type {
   BlogAuthors,
 } from '@xpack/docusaurus-plugin-content-blog';
 import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
-import { eventDateComparator } from './eventDateComparator'
+import { blogDateComparator } from './blogDateComparator'
 import type { ParsedEventDates } from './frontMatterEventDates'
 import { parseFrontMatterEventDates } from './frontMatterEventDates'
 import { getFileLastUpdate } from './lastUpdate';
@@ -560,7 +560,7 @@ export async function generateBlogPosts(
 
   blogPosts.sort(
     // (a, b) => b.metadata.date.getTime() - a.metadata.date.getTime(),
-    eventDateComparator
+    blogDateComparator
   );
 
   if (options.sortPosts === 'ascending') {

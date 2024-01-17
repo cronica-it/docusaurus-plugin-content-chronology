@@ -262,10 +262,10 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
      */
     readonly unlisted: boolean;
 
-    readonly eventDateISO: string,
-    readonly eventEndDateISO: string,
-    readonly eventDateFormatted: string,
-    readonly eventIntervalFormatted: string
+    readonly eventDateISO?: string,
+    readonly eventEndDateISO?: string,
+    readonly eventDateFormatted?: string,
+    readonly eventIntervalFormatted?: string
   };
   /**
    * @returns The edit URL that's directly plugged into metadata.

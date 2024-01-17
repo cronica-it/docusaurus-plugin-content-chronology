@@ -107,22 +107,15 @@ const formatEventInterval = ((eventDate: string, eventEndDate: string): string =
 // ----------------------------------------------------------------------------
 
 export type ParsedEventDates = {
-    eventDateISO: string,
-    eventEndDateISO: string,
-    eventDateFormatted: string,
-    eventIntervalFormatted: string
+    eventDateISO?: string,
+    eventEndDateISO?: string,
+    eventDateFormatted?: string,
+    eventIntervalFormatted?: string
 }
 
 export const parseFrontMatterEventDates = (frontMatter: any, date: Date): ParsedEventDates => {
 
-    const dateISO = date.toISOString();
-    const dateFormatted = formatDate(dateISO)
-    const result: ParsedEventDates = {
-        eventDateISO: dateISO,
-        eventEndDateISO: dateISO,
-        eventDateFormatted: dateFormatted,
-        eventIntervalFormatted: dateFormatted
-    }
+    const result: ParsedEventDates = {}
 
     if (frontMatter.event_date) {
         result.eventDateISO = makeDateISO(frontMatter.event_date)
