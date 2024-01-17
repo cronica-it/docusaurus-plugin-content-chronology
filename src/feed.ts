@@ -202,29 +202,22 @@ function shouldBeInFeed(blogPost: BlogPost): boolean {
 }
 
 export async function createBlogFeedFiles({
-  blogPosts: allBlogPosts,
+  blogPostsNewest,
   options,
   siteConfig,
   outDir,
   locale,
 }: {
-  blogPosts: BlogPost[];
+  blogPostsNewest: BlogPost[];
   options: PluginOptions;
   siteConfig: DocusaurusConfig;
   outDir: string;
   locale: string;
 }): Promise<void> {
-  const blogPosts = allBlogPosts.filter(shouldBeInFeed);
+  const blogPosts = blogPostsNewest.filter(shouldBeInFeed);
 
   const feed = await generateBlogFeed({
-    blogPosts: [...blogPosts].sort(
-      // Revert to the initial sort order by latUpdate/creation date.
-      (a, b) => {
-        const dateA = a.metadata.lastUpdatedAt ? new Date(a.metadata.lastUpdatedAt) : a.metadata.date
-        const dateB = b.metadata.lastUpdatedAt ? new Date(b.metadata.lastUpdatedAt) : b.metadata.date
-        return dateB.getTime() - dateA.getTime()
-      }
-    ),
+    blogPosts,
     options,
     siteConfig,
     outDir,

@@ -42,7 +42,7 @@ import type {
   BlogAuthors,
 } from '@xpack/docusaurus-plugin-content-blog';
 import type { BlogContentPaths, BlogMarkdownLoaderOptions } from './types';
-import { blogDateComparator } from './blogDateComparator'
+import { blogDateComparator } from './blogDateComparators'
 import type { ParsedEventDates } from './frontMatterEventDates'
 import { parseFrontMatterEventDates } from './frontMatterEventDates'
 import { getFileLastUpdate } from './lastUpdate';

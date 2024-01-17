@@ -1,4 +1,3 @@
-"use strict";
 /*
  * This file is part of the Cronica-IT project (https://github.com/cronica-it).
  * Copyright (c) 2023 Liviu Ionescu. All rights reserved.
@@ -9,24 +8,29 @@
  * If a copy of the license was not distributed with this file, it can
  * be obtained from https://opensource.org/license/mit/.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogDateNewestComparator = exports.blogDateComparator = void 0;
+
+import type { BlogPost } from '@xpack/docusaurus-plugin-content-blog';
+import logger from '@docusaurus/logger'
+
 // Compare the number of milliseconds, with the most recent posts on the top.
-const compareDates = ((aDate, bDate) => {
+const compareDates = ((aDate: Date, bDate: Date): number => {
     return bDate.getTime() - aDate.getTime();
-});
-exports.blogDateComparator = ((a, b) => {
+})
+
+export const blogDateComparator = ((a: BlogPost, b: BlogPost): number => {
     // If event dates are available, prefer them over post creation dates.
     if (a.metadata.eventDateISO || b.metadata.eventDateISO) {
-        let aDate = a.metadata.eventDateISO ? new Date(a.metadata.eventDateISO) : a.metadata.date;
-        let bDate = b.metadata.eventDateISO ? new Date(b.metadata.eventDateISO) : b.metadata.date;
+        let aDate: Date = a.metadata.eventDateISO ? new Date(a.metadata.eventDateISO) : a.metadata.date;
+        let bDate: Date = b.metadata.eventDateISO ? new Date(b.metadata.eventDateISO) : b.metadata.date;
         // logger.info(aDate);
         // logger.info(bDate);
-        let value = compareDates(aDate, bDate);
+
+        let value: number = compareDates(aDate, bDate);
         // logger.info(value)
         if (value !== 0) {
-            return value;
+            return value
         }
+
         // For identical event dates, if event end dates are available,
         // use them as secondary criteria.
         if (a.metadata.eventEndDateISO || b.metadata.eventEndDateISO) {
@@ -36,17 +40,20 @@ exports.blogDateComparator = ((a, b) => {
             if (b.metadata.eventEndDateISO) {
                 bDate = new Date(b.metadata.eventEndDateISO);
             }
-            value = compareDates(aDate, bDate);
+
+            value = compareDates(aDate, bDate)
             if (value !== 0) {
-                return value;
+                return value
             }
         }
         // If all are the same, fall through and compare post creation dates.
     }
-    return compareDates(a.metadata.date, b.metadata.date);
-});
-exports.blogDateNewestComparator = ((a, b) => {
-    const aDate = a.metadata.lastUpdatedAt ? new Date(a.metadata.lastUpdatedAt * 1000) : a.metadata.date;
-    const bDate = b.metadata.lastUpdatedAt ? new Date(b.metadata.lastUpdatedAt * 1000) : b.metadata.date;
-    return compareDates(aDate, bDate);
-});
+
+    return compareDates(a.metadata.date, b.metadata.date)
+})
+
+export const blogDateNewestComparator = ((a: BlogPost, b: BlogPost): number => {
+    const aDate = a.metadata.lastUpdatedAt ? new Date(a.metadata.lastUpdatedAt * 1000) : a.metadata.date
+    const bDate = b.metadata.lastUpdatedAt ? new Date(b.metadata.lastUpdatedAt * 1000) : b.metadata.date
+    return compareDates(aDate, bDate)
+})

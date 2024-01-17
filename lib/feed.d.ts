@@ -7,8 +7,8 @@
 /// <reference path="../src/plugin-content-blog.d.ts" />
 import type { DocusaurusConfig } from '@docusaurus/types';
 import type { PluginOptions, BlogPost } from '@xpack/docusaurus-plugin-content-blog';
-export declare function createBlogFeedFiles({ blogPosts: allBlogPosts, options, siteConfig, outDir, locale, }: {
-    blogPosts: BlogPost[];
+export declare function createBlogFeedFiles({ blogPostsNewest, options, siteConfig, outDir, locale, }: {
+    blogPostsNewest: BlogPost[];
     options: PluginOptions;
     siteConfig: DocusaurusConfig;
     outDir: string;

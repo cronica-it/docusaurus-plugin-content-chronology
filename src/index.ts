@@ -47,6 +47,7 @@ import type {
   BlogPaginated,
   ChronologyRecord,
 } from '@xpack/docusaurus-plugin-content-blog';
+import { blogDateNewestComparator } from './blogDateComparators';
 
 export default async function pluginContentBlog(
   context: LoadContext,
@@ -127,6 +128,7 @@ export default async function pluginContentBlog(
         return {
           blogSidebarTitle,
           blogPosts: [],
+          blogPostsNewest: [],
           blogListPaginated: [],
           blogTags: {},
           blogTagsListPath,
@@ -136,6 +138,10 @@ export default async function pluginContentBlog(
           blogAuthorsPaginated: [],
         };
       }
+
+      // Create a new array with the entries sorted by creation/modification
+      // date, to be used in feeds and in a separate web page.
+      const blogPostsNewest = [...blogPosts].sort(blogDateNewestComparator)
 
       // Collocate next and prev metadata.
       listedBlogPosts.forEach((blogPost, index) => {
@@ -187,6 +193,7 @@ export default async function pluginContentBlog(
       return {
         blogSidebarTitle,
         blogPosts,
+        blogPostsNewest,
         blogListPaginated,
         blogTags,
         blogTagsListPath,
@@ -214,6 +221,7 @@ export default async function pluginContentBlog(
       const {
         blogSidebarTitle,
         blogPosts,
+        blogPostsNewest,
         blogListPaginated,
         blogTags,
         blogTagsListPath,
@@ -573,12 +581,12 @@ export default async function pluginContentBlog(
       if (!options.feedOptions.type) {
         return;
       }
-      const { blogPosts } = content;
-      if (!blogPosts.length) {
+      const { blogPostsNewest } = content;
+      if (!blogPostsNewest.length) {
         return;
       }
       await createBlogFeedFiles({
-        blogPosts,
+        blogPostsNewest,
         options,
         outDir,
         siteConfig,
@@ -643,5 +651,5 @@ export default async function pluginContentBlog(
 
 export { validateOptions } from './options';
 
-export { blogDateComparator } from './blogDateComparator'
+export { blogDateComparator } from './blogDateComparators'
 

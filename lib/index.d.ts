@@ -9,4 +9,4 @@ import type { LoadContext, Plugin } from '@docusaurus/types';
 import type { PluginOptions, BlogContent } from '@xpack/docusaurus-plugin-content-blog';
 export default function pluginContentBlog(context: LoadContext, options: PluginOptions): Promise<Plugin<BlogContent>>;
 export { validateOptions } from './options';
-export { blogDateComparator } from './blogDateComparator';
+export { blogDateComparator } from './blogDateComparators';

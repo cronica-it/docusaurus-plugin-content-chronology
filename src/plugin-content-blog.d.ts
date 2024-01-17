@@ -498,6 +498,7 @@ yarn workspace v1.22.19image` is a collocated image path, this entry will be the
   export type BlogContent = {
     blogSidebarTitle: string;
     blogPosts: BlogPost[];
+    blogPostsNewest: BlogPost[];
     blogListPaginated: BlogPaginated[];
     blogTags: BlogTags;
     blogTagsListPath: string;
